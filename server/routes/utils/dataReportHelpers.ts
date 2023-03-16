@@ -50,7 +50,7 @@ export const getSelectedFields = async (columns) => {
 
 // Build the OpenSearch query from the meta data
 // is_count is set to 1 if we building the count query but 0 if we building the fetch data query
-export const buildRequestBody = (report: any, allowLeadingWildcards: boolean, is_count: number) => {
+export const buildRequestBody = (report: any, allowLeadingWildcards: boolean, timezone: string, is_count: number) => {
   let esbBoolQuery = esb.boolQuery();
   const searchSourceJSON = report._source.searchSourceJSON;
   const savedObjectQuery: Query = JSON.parse(searchSourceJSON).query;
@@ -59,6 +59,7 @@ export const buildRequestBody = (report: any, allowLeadingWildcards: boolean, is
     allowLeadingWildcards: allowLeadingWildcards,
     queryStringOptions: {},
     ignoreFilterIfFieldNotInIndex: false,
+    dateFormatTZ: timezone,
   }
   const QueryFromSavedObject = buildOpenSearchQuery(
     undefined,
@@ -74,6 +75,7 @@ export const buildRequestBody = (report: any, allowLeadingWildcards: boolean, is
         .format('epoch_millis')
         .gte(report._source.start - 1)
         .lte(report._source.end + 1)
+        .timeZone(timezone)
     );
   }
   if (is_count) {

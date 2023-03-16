@@ -28,6 +28,7 @@ const scrollTimeout = '1m';
 export async function createSavedSearchReport(
   report: any,
   client: ILegacyClusterClient | ILegacyScopedClusterClient,
+  timezone: string,
   dateFormat: string,
   csvSeparator: string,
   allowLeadingWildcards: boolean,
@@ -42,6 +43,7 @@ export async function createSavedSearchReport(
   const data = await generateReportData(
     client,
     params.core_params,
+    timezone,
     dateFormat,
     csvSeparator,
     allowLeadingWildcards,
@@ -130,6 +132,7 @@ async function populateMetaData(
 async function generateReportData(
   client: ILegacyClusterClient | ILegacyScopedClusterClient,
   params: any,
+  timezone: string,
   dateFormat: string,
   csvSeparator: string,
   allowLeadingWildcards: boolean,
@@ -148,7 +151,7 @@ async function generateReportData(
     return '';
   }
 
-  const reqBody = buildRequestBody(report, allowLeadingWildcards, 0);
+  const reqBody = buildRequestBody(report, allowLeadingWildcards, timezone, 0);
   logger.info(
     `[Reporting csv module] DSL request body: ${JSON.stringify(reqBody)}`
   );
@@ -185,7 +188,7 @@ async function generateReportData(
 
   // Build the OpenSearch Count query to count the size of result
   async function getOpenSearchDataSize() {
-    const countReq = buildRequestBody(report, allowLeadingWildcards, 1);
+    const countReq = buildRequestBody(report, allowLeadingWildcards, timezone, 1);
     return await callCluster(
       client,
       'count',

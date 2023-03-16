@@ -74,6 +74,7 @@ export const createReport = async (
       createReportResult = await createSavedSearchReport(
         report,
         opensearchClient,
+        timezone,
         dateFormat,
         csvSeparator,
         allowLeadingWildcards,
